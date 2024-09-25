@@ -1,99 +1,114 @@
-const canvas = document.getElementById('flappyCanvas');
+const canvas = document.getElementById('game-canvas');
 const ctx = canvas.getContext('2d');
 
-// Game variables
-let level = 1;
-let score = 0;
-let bird = {
-  x: 50,
-  y: 150,
-  width: 40,
-  height: 40,
-  radius: 20, // For rounded corners
-  gravity: 1.5,
-  velocity: 0,
-  lift: -15
-};
-let pipes = [];
-let pipeWidth = 50;
-let pipeGap = 150;
-let pipeSpeed = 3;
-let frames = 0;
-let isGameOver = false;
-let skinColor = '#ffeb3b'; // Default bird skin color
+const startButton = document.getElementById('start-button');
+const skinButton = document.getElementById('skin-button');
+const restartButton = document.getElementById('restart-button');
+const menuButton = document.getElementById('menu-button');
 
-// Load bird skins (optional, if you want skins)
-const birdSkins = ['#ffeb3b', '#e91e63', '#4caf50', '#03a9f4', '#ff5722']; // Example skin colors
+const menu = document.getElementById('menu');
+const gameOverScreen = document.getElementById('game-over');
+const finalScoreElement = document.getElementById('final-score');
+const currentLevelElement = document.getElementById('current-level');
+const currentScoreElement = document.getElementById('current-score');
 
-// Event listener for bird jump
+let bird, pipes, score, level, gameLoop;
+
+const GRAVITY = 0.5;
+const FLAP_STRENGTH = -10;
+const PIPE_SPEED = 2;
+
+const THEMES = [
+    { name: 'Day', background: '#87CEEB', pipeColor: '#2ecc71' },
+    { name: 'Night', background: '#2c3e50', pipeColor: '#e74c3c' },
+    // Add more themes for each level
+];
+
+const SKINS = [
+    { name: 'Classic', color: 'yellow' },
+    { name: 'Blue', color: 'blue' },
+    // Add more skins
+];
+
+let currentSkin = SKINS[0];
+
+function initGame() {
+    bird = {
+        x: 50,
+        y: canvas.height / 2,
+        width: 30,
+        height: 30,
+        velocity: 0
+    };
+
+    pipes = [];
+    score = 0;
+    level = 1;
+
+    generatePipes();
+}
+
+function generatePipes() {
+    // Implement pipe generation logic
+}
+
+function updateGame() {
+    // Implement game update logic (bird movement, pipe movement, collision detection, etc.)
+}
+
+function drawGame() {
+    // Implement game drawing logic
+}
+
+function startGame() {
+    initGame();
+    menu.classList.add('hidden');
+    gameLoop = setInterval(gameLoop, 1000 / 60); // 60 FPS
+}
+
+function gameLoop() {
+    updateGame();
+    drawGame();
+}
+
+function endGame() {
+    clearInterval(gameLoop);
+    gameOverScreen.classList.remove('hidden');
+    finalScoreElement.textContent = score;
+}
+
+function restartGame() {
+    gameOverScreen.classList.add('hidden');
+    startGame();
+}
+
+function showMenu() {
+    gameOverScreen.classList.add('hidden');
+    menu.classList.remove('hidden');
+}
+
+startButton.addEventListener('click', startGame);
+skinButton.addEventListener('click', showSkinSelection);
+restartButton.addEventListener('click', restartGame);
+menuButton.addEventListener('click', showMenu);
+
 document.addEventListener('keydown', (e) => {
-  if (e.code === 'Space' && !isGameOver) {
-    bird.velocity = bird.lift;
-  }
+    if (e.code === 'Space') {
+        flapBird();
+    }
 });
 
-// Game loop
-function gameLoop() {
-  if (isGameOver) return;
+canvas.addEventListener('click', flapBird);
 
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  
-  // Bird movement
-  bird.velocity += bird.gravity;
-  bird.y += bird.velocity;
-  if (bird.y > canvas.height - bird.radius) {
-    bird.y = canvas.height - bird.radius;
-    isGameOver = true;
-  }
-
-  // Draw bird with rounded corners
-  ctx.beginPath();
-  ctx.arc(bird.x + bird.radius, bird.y + bird.radius, bird.radius, 0, Math.PI * 2);
-  ctx.fillStyle = skinColor;
-  ctx.fill();
-  ctx.closePath();
-
-  // Pipes generation
-  if (frames % 100 === 0) {
-    pipes.push({
-      x: canvas.width,
-      y: Math.floor(Math.random() * (canvas.height - pipeGap))
-    });
-  }
-
-  // Draw pipes with rounded corners
-  pipes.forEach((pipe, index) => {
-    ctx.fillStyle = '#388e3c'; // Pipe color
-    ctx.lineJoin = "round";
-
-    // Upper pipe
-    ctx.beginPath();
-    ctx.roundRect(pipe.x, 0, pipeWidth, pipe.y, 10); // Rounded corners for pipes
-    ctx.fill();
-    ctx.closePath();
-
-    // Lower pipe
-    ctx.beginPath();
-    ctx.roundRect(pipe.x, pipe.y + pipeGap, pipeWidth, canvas.height - (pipe.y + pipeGap), 10); // Rounded corners for pipes
-    ctx.fill();
-    ctx.closePath();
-
-    pipe.x -= pipeSpeed;
-
-    // Check for collisions
-    if (
-      bird.x + bird.radius > pipe.x &&
-      bird.x - bird.radius < pipe.x + pipeWidth &&
-      (bird.y - bird.radius < pipe.y || bird.y + bird.radius > pipe.y + pipeGap)
-    ) {
-      isGameOver = true;
+function flapBird() {
+    if (gameLoop) {
+        bird.velocity = FLAP_STRENGTH;
     }
+}
 
-    // Remove off-screen pipes and update score
-    if (pipe.x + pipeWidth < 0) {
-      pipes.splice(index, 1);
-      score++;
-      document.getElementById('score').innerText = score;
+function showSkinSelection() {
+    // Implement skin selection UI and logic
+}
 
-      // Increase level every 5 points
-      if (score % 5 === 0 && level < 20) {
+// Initialize the game
+initGame();
