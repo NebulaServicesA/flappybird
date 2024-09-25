@@ -9,6 +9,7 @@ let bird = {
   y: 150,
   width: 40,
   height: 40,
+  radius: 20, // For rounded corners
   gravity: 1.5,
   velocity: 0,
   lift: -15
@@ -19,14 +20,14 @@ let pipeGap = 150;
 let pipeSpeed = 3;
 let frames = 0;
 let isGameOver = false;
-let skinColor = '#ff0'; // Default bird skin color
+let skinColor = '#ffeb3b'; // Default bird skin color
 
 // Load bird skins (optional, if you want skins)
-const birdSkins = ['#ff0', '#f00', '#0f0', '#00f', '#f0f']; // Example skin colors
+const birdSkins = ['#ffeb3b', '#e91e63', '#4caf50', '#03a9f4', '#ff5722']; // Example skin colors
 
-// Event listeners for bird movement
-document.addEventListener('keydown', () => {
-  if (!isGameOver) {
+// Event listener for bird jump
+document.addEventListener('keydown', (e) => {
+  if (e.code === 'Space' && !isGameOver) {
     bird.velocity = bird.lift;
   }
 });
@@ -40,14 +41,17 @@ function gameLoop() {
   // Bird movement
   bird.velocity += bird.gravity;
   bird.y += bird.velocity;
-  if (bird.y > canvas.height - bird.height) {
-    bird.y = canvas.height - bird.height;
+  if (bird.y > canvas.height - bird.radius) {
+    bird.y = canvas.height - bird.radius;
     isGameOver = true;
   }
 
-  // Draw bird
+  // Draw bird with rounded corners
+  ctx.beginPath();
+  ctx.arc(bird.x + bird.radius, bird.y + bird.radius, bird.radius, 0, Math.PI * 2);
   ctx.fillStyle = skinColor;
-  ctx.fillRect(bird.x, bird.y, bird.width, bird.height);
+  ctx.fill();
+  ctx.closePath();
 
   // Pipes generation
   if (frames % 100 === 0) {
@@ -57,21 +61,30 @@ function gameLoop() {
     });
   }
 
-  // Draw pipes
+  // Draw pipes with rounded corners
   pipes.forEach((pipe, index) => {
+    ctx.fillStyle = '#388e3c'; // Pipe color
+    ctx.lineJoin = "round";
+
     // Upper pipe
-    ctx.fillStyle = '#228B22';
-    ctx.fillRect(pipe.x, 0, pipeWidth, pipe.y);
+    ctx.beginPath();
+    ctx.roundRect(pipe.x, 0, pipeWidth, pipe.y, 10); // Rounded corners for pipes
+    ctx.fill();
+    ctx.closePath();
+
     // Lower pipe
-    ctx.fillRect(pipe.x, pipe.y + pipeGap, pipeWidth, canvas.height);
+    ctx.beginPath();
+    ctx.roundRect(pipe.x, pipe.y + pipeGap, pipeWidth, canvas.height - (pipe.y + pipeGap), 10); // Rounded corners for pipes
+    ctx.fill();
+    ctx.closePath();
 
     pipe.x -= pipeSpeed;
 
     // Check for collisions
     if (
-      bird.x + bird.width > pipe.x &&
-      bird.x < pipe.x + pipeWidth &&
-      (bird.y < pipe.y || bird.y + bird.height > pipe.y + pipeGap)
+      bird.x + bird.radius > pipe.x &&
+      bird.x - bird.radius < pipe.x + pipeWidth &&
+      (bird.y - bird.radius < pipe.y || bird.y + bird.radius > pipe.y + pipeGap)
     ) {
       isGameOver = true;
     }
@@ -84,21 +97,3 @@ function gameLoop() {
 
       // Increase level every 5 points
       if (score % 5 === 0 && level < 20) {
-        level++;
-        pipeSpeed += 0.5;
-        document.getElementById('level-number').innerText = level;
-
-        // Change skin every 5 levels
-        if (level % 5 === 0) {
-          skinColor = birdSkins[level / 5 % birdSkins.length];
-        }
-      }
-    }
-  });
-
-  frames++;
-  requestAnimationFrame(gameLoop);
-}
-
-// Start the game
-gameLoop();
