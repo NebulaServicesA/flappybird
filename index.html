@@ -1,39 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Flappy Bird - Modern Edition</title>
-  <style>
-    body {
-      margin: 0;
-      background-color: #81d4fa;
-      font-family: 'Arial', sans-serif;
-    }
-
-    canvas {
-      display: block;
-      margin: 0 auto;
-      background-color: #4fc3f7;
-      border: 2px solid #0288d1;
-      border-radius: 15px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    }
-
-    .level-info {
-      text-align: center;
-      font-size: 22px;
-      padding: 15px;
-      color: white;
-      font-weight: bold;
-      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Flappy Bird</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="level-info">Level: <span id="level-number">1</span> | Score: <span id="score">0</span></div>
-  <canvas id="flappyCanvas" width="400" height="600"></canvas>
-
-  <script src="game.js"></script>
+    <div id="game-container">
+        <canvas id="game-canvas"></canvas>
+        <div id="menu">
+            <h1>Modern Flappy Bird</h1>
+            <button id="start-button">Start Game</button>
+            <button id="skin-button">Choose Skin</button>
+        </div>
+        <div id="game-over" class="hidden">
+            <h2>Game Over</h2>
+            <p>Score: <span id="final-score"></span></p>
+            <button id="restart-button">Restart</button>
+            <button id="menu-button">Main Menu</button>
+        </div>
+        <div id="level-info">
+            <p>Level: <span id="current-level"></span></p>
+            <p>Score: <span id="current-score"></span></p>
+        </div>
+    </div>
+    <script src="game.js"></script>
 </body>
 </html>
